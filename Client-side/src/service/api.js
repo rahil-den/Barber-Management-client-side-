@@ -12,3 +12,13 @@ export const getallBarber = async () => {
         return error;
     }
 }
+
+export const adduser = async (formData) =>{
+    try{
+        console.log(formData);
+        const response = await axios.post(`${URL}/adduser`,formData);
+        return response.data;
+    } catch(err){
+        return err;
+    }
+}

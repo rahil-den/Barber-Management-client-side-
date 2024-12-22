@@ -4,6 +4,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 // import './App.css';
 import GetallBarber from './components/allBarber.jsx';
+import UserForm from './pages/signup.jsx';
 // import Home from './components/Home';
 // import NavBar from './components/Navbar';
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
@@ -19,7 +20,7 @@ function App() {
        
         {/* <Route path="/" element={<Home />} /> */}
         <Route path="/getallBarber" element={<GetallBarber />} />
-        {/* <Route path="/adduser" element={<AddUser />} /> */}
+        <Route path="/signup" element={<UserForm />} />
         {/* <Route path="/edit/:id" element={<Edituser />} /> */}
         {/* <Route path="/delete/:id"/> */}
       </Routes>
