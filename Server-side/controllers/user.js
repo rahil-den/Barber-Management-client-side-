@@ -41,5 +41,43 @@ const addUser = async (req, res) => {
   }
 };
 
-export { addUser };
+const addAppointment = async (req, res) => {
+  
+  console.log(req.body);
+  //add appointment into database with some validation
+  try {
+    // Set the search path to the 'admin' schema
+    await client.query("SET search_path TO 'admin'");
+
+    // Destructure values from the request body
+    let { barber_id, appointment_date, customer_name, payment } = req.body;
+
+    // Validate the appointment_date (if needed, for example, check if it's a valid date format)
+    if (!appointment_date) {
+      return res.status(400).json({ error: "Invalid appointment date" });
+    }
+
+    // Insert the appointment into the database
+    const result = await client.query(
+      `INSERT INTO "appointment"("barber_id", "appointment_date", "customer_name", "payment") 
+      VALUES ($1, $2, $3, $4) RETURNING *`,
+      [barber_id, appointment_date, customer_name, payment]
+    );
+
+    // Log that the appointment was inserted
+    console.log("Appointment inserted");
+
+    // Send a success response with the inserted appointment
+    res.status(201).json({
+      message: "Appointment created successfully",
+      appointment: result.rows[0]  // Return the first row (the inserted appointment)
+    });
+  } catch (err) {
+    // Log the error and send a failure response
+    console.error("Error inserting appointment:", err);
+    res.status(500).json({ error: "Failed to create appointment" });
+  }
+}
+
+export { addUser, addAppointment };
 

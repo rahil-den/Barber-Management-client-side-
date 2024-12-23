@@ -4,6 +4,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 // import './App.css';
 import GetallBarber from './components/allBarber.jsx';
+import AppointmentForm from './pages/appointment_form.jsx';
 import UserForm from './pages/signup.jsx';
 // import Home from './components/Home';
 // import NavBar from './components/Navbar';
@@ -21,6 +22,7 @@ function App() {
         {/* <Route path="/" element={<Home />} /> */}
         <Route path="/getallBarber" element={<GetallBarber />} />
         <Route path="/signup" element={<UserForm />} />
+        <Route path="/addappointment" element={<AppointmentForm />} />
         {/* <Route path="/edit/:id" element={<Edituser />} /> */}
         {/* <Route path="/delete/:id"/> */}
       </Routes>

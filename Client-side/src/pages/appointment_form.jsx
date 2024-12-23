@@ -13,35 +13,26 @@ import {
   FormHelperText,
   Alert,
 } from "@mui/material";
+import { addappointment } from "../service/api.js";
 
 const AppointmentForm = () => {
   const [formData, setFormData] = useState({
     barber_id: "",
-    user_id: "",
     appointment_date: "",
     customer_name: "",
-    payment: 0.00,
-    status: "pending",
+    payment: 50.00, // Fixed payment amount
   });
 
   const [barbers, setBarbers] = useState([]);
-  const [users, setUsers] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Fetch barbers and users from the backend
+  // Fetch barbers from the API
   useEffect(() => {
-    // Fetch barbers
-    fetch("http://localhost:5000/api/barbers")
+    fetch("http://localhost:3000/allBarber")
       .then((res) => res.json())
       .then((data) => setBarbers(data))
       .catch((err) => console.error("Error fetching barbers:", err));
-
-    // Fetch users
-    fetch("http://localhost:5000/api/users")
-      .then((res) => res.json())
-      .then((data) => setUsers(data))
-      .catch((err) => console.error("Error fetching users:", err));
   }, []);
 
   const handleChange = (e) => {
@@ -51,45 +42,38 @@ const AppointmentForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage("");
-    setSuccessMessage("");
+    setErrorMessage(""); // Clear previous error messages
+    setSuccessMessage(""); // Clear previous success messages
 
-    // Validation Example: Check for empty fields
-    if (
-      !formData.barber_id ||
-      !formData.user_id ||
-      !formData.appointment_date ||
-      !formData.customer_name
-    ) {
+    // Validation: Check for empty fields
+    if (!formData.barber_id || !formData.appointment_date || !formData.customer_name) {
       setErrorMessage("All fields are required.");
-      return;
+      return; // Stop submission if fields are empty
     }
 
-    // Simulate sending data to the backend
+    // If all fields are valid, show success message
+    setSuccessMessage("Appointment created successfully!");
+
+    // Call the API to add the appointment
     try {
-      const response = await fetch("http://localhost:5000/api/appointments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        setSuccessMessage("Appointment created successfully!");
-        setFormData({
-          barber_id: "",
-          user_id: "",
-          appointment_date: "",
-          customer_name: "",
-          payment: 0.00,
-          status: "pending",
-        });
-      } else {
-        const error = await response.json();
-        setErrorMessage(error.message || "Something went wrong.");
-      }
-    } catch (err) {
-      setErrorMessage("Error connecting to the server.");
+      const response = await addappointment(formData);
+      console.log("Appointment Response:", response);
+    } catch (error) {
+      console.error("Error adding appointment:", error);
+      setErrorMessage("There was an error creating the appointment.");
     }
+
+    // Reset form data (keeping fixed payment)
+    setFormData({
+      barber_id: "",
+      appointment_date: "",
+      customer_name: "",
+      payment: 50.00, // Fixed payment amount
+    });
+
+    setTimeout(() => {
+      setSuccessMessage(""); // Hide success message after 3 seconds
+    }, 3000);
   };
 
   return (
@@ -124,25 +108,6 @@ const AppointmentForm = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>User</InputLabel>
-                <Select
-                  label="User"
-                  name="user_id"
-                  value={formData.user_id}
-                  onChange={handleChange}
-                >
-                  {users.map((user) => (
-                    <MenuItem key={user.user_id} value={user.user_id}>
-                      {user.user_name}
-                    </MenuItem>
-                  ))}
-                </Select>
-                <FormHelperText>Choose a user</FormHelperText>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={12}>
               <TextField
                 fullWidth
                 label="Appointment Date"
@@ -171,6 +136,11 @@ const AppointmentForm = () => {
             </Grid>
 
             <Grid item xs={12}>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body1">
+                  Payment is to be made of 50 rupees for booking your appointment
+                </Typography>
+              </Box>
               <TextField
                 fullWidth
                 label="Payment"
@@ -181,25 +151,9 @@ const AppointmentForm = () => {
                 variant="outlined"
                 required
                 InputProps={{
-                  inputProps: { min: 0 },
+                  inputProps: { min: 50, readOnly: true }, // Making the input readonly
                 }}
               />
-            </Grid>
-
-            <Grid item xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Status</InputLabel>
-                <Select
-                  label="Status"
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                >
-                  <MenuItem value="pending">Pending</MenuItem>
-                  <MenuItem value="confirmed">Confirmed</MenuItem>
-                  <MenuItem value="canceled">Canceled</MenuItem>
-                </Select>
-              </FormControl>
             </Grid>
           </Grid>
 
